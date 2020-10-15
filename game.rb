@@ -1,28 +1,34 @@
 require 'gosu'
-GRAVITY = 10
+GRAVITY = 5
 JUMP_VEL=2
+FIRE_VEL=15
+BACKGROUND_SCROLL_SPEEED= 0.5
 
 class Tutorial < Gosu::Window
     def initialize
         super 640,480
         self.caption="Tutorial Game"
-        #using hashes to put images 
+       
+        @meteor= Meteor.new(200,0,1,self)
+        @player= Player.new(320,height-30,0)
+        # @player.warp(320,height-30)
+        #using hash to put images
         @images={
             background_image: Gosu::Image.new(self,"sky.jpg",true),
             meteor_image: Gosu::Image.new("meteor.png"),
             fire_image: Gosu::Image.new("fire.png")
         }
-        @met_x,@met_y,@met_vel_y=200,0,1
-        @player= Player.new
-        @player.warp(320,height-30)
-        @scroll_y,@fire_vel_y,@fire_y=0,0,0
+       
+        @bkg_scroll_y,@fire_vel_y,@fire_y,@fire_x=0,0,0,@player.x
+       
     end
 
     def update
-        #background image scroll
-        @scroll_y+=3
-        if @scroll_y> height
-            @scroll_y=0
+        #background scroll
+        @bkg_scroll_y+= BACKGROUND_SCROLL_SPEEED
+
+        if @bkg_scroll_y> height
+            @bkg_scroll_y=0
         end
         
         if Gosu.button_down? Gosu::KB_LEFT 
@@ -31,29 +37,26 @@ class Tutorial < Gosu::Window
         if Gosu.button_down? Gosu::KB_RIGHT 
             @player.move_right
         end
-        if Gosu.button_down? Gosu::KB_SPACE
-            @fire_vel_y = -10
-            # += Gosu.offset_y(0,1)  
+
+        if Gosu.button_down? Gosu::KB_SPACE and @fire_vel_y==0
+            @fire_vel_y = -FIRE_VEL
+            @fire_x= @player.x
         end
+
         if @fire_y<-height
             @fire_y=@fire_vel_y=0      
         end
         @fire_y+=@fire_vel_y
-        
-
-        if @met_y<=height 
-            @met_vel_y+= GRAVITY*(update_interval/1000.0)
-            @met_y-=-@met_vel_y
-        end
-        
+        @meteor.update
     end
 
     def draw 
         @player.draw
-        @images[:meteor_image].draw(@met_x,@met_y,2,0.05,0.05)
-        @images[:background_image].draw(0,@scroll_y,0)
-        @images[:background_image].draw(0,@scroll_y-height,0)
-        @images[:fire_image].draw_rot(@player.getx,@player.gety-20+@fire_y,1,0,0.45,0,0.04,0.04);
+        @meteor.draw
+        @images[:background_image].draw(0,@bkg_scroll_y,0)
+        @images[:background_image].draw(0,@bkg_scroll_y-height,0)
+        @images[:fire_image].draw_rot(@fire_x,@player.y+@fire_y+30,1,0,0.45,0,0.04,0.04);                
+              
     end
 
     def button_down(id)
@@ -66,23 +69,19 @@ class Tutorial < Gosu::Window
 end
 
 class Player
-    def initialize
-        super
+    attr_accessor :x,:y,:angle
+
+    def initialize(x,y,angle)
         @image=Gosu::Image.new("starfighter.bmp")
-        
-        @x=@y=@vel_x=@vel_y=@angle=0.0
-        @score = 0
+        @x=x 
+        @y=y 
+        @angle=angle
     end
+
     def warp(x,y)
         @x,@y= x,y 
     end 
-    def gety
-        return @y
-    end
-    def getx
-        return @x
-    end
-
+    
     def move_left
         if @x>25
             @x -=5  
@@ -94,10 +93,39 @@ class Player
             @x +=5
         end
     end
-  
+    
     def draw
-        
     @image.draw_rot(@x,@y,2,@angle)
+    end
+
+end
+
+class Meteor
+    attr_accessor :met_x, :met_y , :met_vel_y
+    
+    def initialize (met_x,met_y,met_vel_y,window)
+        @meteor_image= Gosu::Image.new("meteor.png")
+        @met_x=met_x
+        @met_y=met_y
+        @met_vel_y=met_vel_y
+        @window=window
+    end
+
+    def update
+        if @met_y <= @window.height 
+            @met_vel_y += GRAVITY*(@window.update_interval/1000.0)
+            @met_y-= -@met_vel_y
+        else
+            @met_y,@met_vel_y=0,0
+            @met_x= rand(@window.width)
+            puts @met_x,@met_y,@met_vel_y
+        end
+        
+    end
+
+    
+    def draw
+        @meteor_image.draw(@met_x,@met_y,2,0.05,0.05)      
     end
 end
 
