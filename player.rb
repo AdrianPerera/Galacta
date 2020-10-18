@@ -30,12 +30,11 @@ class Player
     end
 
     def hitByMeteor(meteor)
-        if Gosu::distance(meteor.met_x,meteor.met_y,@x,@y)<30  
-            @explosion_sound.play
-            return true
-        else
-            return false
-        end       
+            if Gosu::distance(meteor.met_x,meteor.met_y,@x,@y)<30  
+                return true
+            else
+                return false
+            end       
     end
     
     def draw
@@ -43,6 +42,7 @@ class Player
             img = @boom_anim[Gosu.milliseconds / 150 % @boom_anim.size]
             img.draw(@x - img.width / 2.0, @y - img.height / 2.0,2, 1, 1)
             if Time.now-@time_hit>1
+                @explosion_sound.play
                 @exploded=false
                 @lives-=1
                 @x,@y=320,430

@@ -1,7 +1,5 @@
 class Meteor
-    attr_accessor :met_x, :met_y , :met_vel_y , :exploded , :time_hit
-    attr_reader :score
-    
+    attr_accessor :met_x, :met_y , :met_vel_y , :exploded , :time_hit 
     def initialize (met_x,met_y,met_vel_y,window)
         @met_x=met_x
         @met_y=met_y
@@ -10,8 +8,7 @@ class Meteor
         @meteor_image= Gosu::Image.new("images/meteor.png")
         @boom_anim= Gosu::Image.load_tiles("images/boom.png",127,127)
         @exploded=false
-        @time_hit=nil
-        @score=0
+        @time_hit=nil       
     end
 
     def hitByFire(fire)
@@ -34,13 +31,11 @@ class Meteor
     end
     
     def draw
-         
         if @exploded
             img = @boom_anim[Gosu.milliseconds / 50 % @boom_anim.size]
             img.draw(@met_x -15, @met_y-15 ,2, 0.5, 0.5)
             if Time.now-@time_hit>0.2
                 @exploded=false
-                @score+=10
                 respawn
             end
         else
