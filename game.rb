@@ -5,16 +5,20 @@ require_relative 'fire'
 
 GRAVITY = 3
 BACKGROUND_SCROLL_SPEEED= 0.5
-
+NO_OF_METEORS=3
 #--------------------------------------------MainGame Class----------------------------------------------------------------------------
 class MainGame < Gosu::Window
+    attr_accessor :game_over, :score
     def initialize
         super 640,480
         self.caption="Galacta"
         @player= Player.new(320,height-55)
-        @meteors=[Meteor.new(200,0,1,self),Meteor.new(300,0,1,self)] #array of meteors
+        @meteors=[]                     # Empty array of meteors
+        (0..NO_OF_METEORS).each {|i| 
+            @meteors.push(Meteor.new(rand(width-20),0,1,self))
+        } #Generating Meteors
         @fire= Fire.new(self)
-        #using hash to put images
+        @gameOverMusic=Gosu::Sample.new('sounds/gameover.mp3')
         @background_image=Gosu::Image.new(self,"images/sky.jpg",true)
         @bkg_scroll_y=0
         @font = Gosu::Font.new(25)
@@ -22,13 +26,14 @@ class MainGame < Gosu::Window
         @game_over=false
     end
 
-    def update
+
+    def update 
         #background scroll
         @bkg_scroll_y+= BACKGROUND_SCROLL_SPEEED
 
         if @player.lives==0
-            @game_over=true
-        end
+            @game_over=true     
+        end     
 
         if @bkg_scroll_y> height
             @bkg_scroll_y=0
@@ -47,7 +52,6 @@ class MainGame < Gosu::Window
                 if meteor.hitByFire(@fire)
                     meteor.time_hit=Time.now
                     meteor.exploded=true
-                    @score+=10
                 end
             end
         end
@@ -66,19 +70,16 @@ class MainGame < Gosu::Window
             @player.lives=3
             @score=0
             @game_over=false
+            @game_running=true
         end
 
         if !@game_over
             @meteors.each {|meteor| meteor.update}
         end
-      
-
-        # @meteor.update
+    
         @fire.update
        
     end
-
- 
 
     def draw 
         @background_image.draw(0,@bkg_scroll_y,0)
@@ -93,8 +94,6 @@ class MainGame < Gosu::Window
             @meteors.each {|meteor| meteor.draw}
             @fire.draw
         end
-
-
     end
 
     def button_down(id)

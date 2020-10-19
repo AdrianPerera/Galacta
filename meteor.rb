@@ -17,7 +17,7 @@ class Meteor
 
     def respawn
         @met_y,@met_vel_y=0,0
-        @met_x= rand(@window.width)
+        @met_x= rand(@window.width-20)
     end
 
 
@@ -36,6 +36,7 @@ class Meteor
             img.draw(@met_x -15, @met_y-15 ,2, 0.5, 0.5)
             if Time.now-@time_hit>0.2
                 @exploded=false
+                @window.score+=10
                 respawn
             end
         else

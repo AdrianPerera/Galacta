@@ -11,8 +11,8 @@ class Fire
 
     def launch(x)
         @emerge=true
-        @x=x
-        @y=@window.height-30
+        @x=x-5                 #adjusting firing point to the middle of the spaceship
+        @y=@window.height-30   #adjusting bullet y height
         @fire_sound.play
     end
 
