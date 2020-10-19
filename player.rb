@@ -41,7 +41,7 @@ class Player
         if @exploded
             img = @boom_anim[Gosu.milliseconds / 150 % @boom_anim.size]
             img.draw(@x - img.width / 2.0, @y - img.height / 2.0,2, 1, 1)
-            if Time.now-@time_hit>1
+            if Time.now-@time_hit>0.2
                 @explosion_sound.play
                 @exploded=false
                 @lives-=1

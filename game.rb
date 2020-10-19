@@ -5,7 +5,8 @@ require_relative 'fire'
 
 GRAVITY = 3
 BACKGROUND_SCROLL_SPEEED= 0.5
-NO_OF_METEORS=3
+NO_OF_METEORS=4
+
 #--------------------------------------------MainGame Class----------------------------------------------------------------------------
 class MainGame < Gosu::Window
     attr_accessor :game_over, :score
@@ -43,6 +44,7 @@ class MainGame < Gosu::Window
             if @player.hitByMeteor(meteor)
                 @player.time_hit=Time.now
                 @player.exploded=true
+                break
              end
         end
        
